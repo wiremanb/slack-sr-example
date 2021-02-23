@@ -105,20 +105,41 @@ func SlackHandler(c *gin.Context) {
 	if err != nil {
 		var response SlackResponse
 		log.Errorf("Failed reading body: %s", string(postBytes))
-		response.SlackBlocks = append(response.SlackBlocks, SlackBlock{Type: "section", Text: &SlackText{Type: "mrkdwn", Text: DEFAULT_RESPONSE}, Accessory: nil})
+		response.SlackBlocks = append(response.SlackBlocks, SlackBlock {
+			Type: "section",
+			Text: &SlackText {
+				Type: "mrkdwn",
+				Text: DEFAULT_RESPONSE,
+			},
+			Accessory: nil,
+		})
 		c.JSON(500, response)
 		return
 	}
 	if verifySlackRequest(SLACK_SIGNING_SECRET,version,string(postBytes),requestTimestamp,requestSignature) == true {
 		var response SlackResponse
 		log.Infof("Success")
-		response.SlackBlocks = append(response.SlackBlocks, SlackBlock{Type: "section", Text: &SlackText{Type: "mrkdwn", Text: "Successfully verified request"}, Accessory: nil})
+		response.SlackBlocks = append(response.SlackBlocks, SlackBlock {
+			Type: "section",
+			Text: &SlackText {
+				Type: "mrkdwn",
+				Text: "Successfully verified request",
+			},
+			Accessory: nil,
+		})
 		c.JSON(200, response)
 		return
 	} else {
 		var response SlackResponse
 		log.Errorf("Failed verification")
-		response.SlackBlocks = append(response.SlackBlocks, SlackBlock{Type: "section", Text: &SlackText{Type: "mrkdwn", Text: "Failed verification"}, Accessory: nil})
+		response.SlackBlocks = append(response.SlackBlocks, SlackBlock {
+			Type: "section",
+			Text: &SlackText {
+				Type: "mrkdwn",
+				Text: DEFAULT_RESPONSE,
+			},
+			Accessory: nil,
+		})
 		c.JSON(400, response)
 		return
 	}
@@ -133,8 +154,8 @@ func verifySlackRequest(signingSecret, version, requestBody, requestTimestamp, r
 		return false
 	}
 	verificationString := fmt.Sprintf("%s=%x", version, hash.Sum(nil))
-	log.Infof("\nHMAC-Sha256: %s\n", verificationString)
-	log.Infof("\nVerify Against: %s\n", requestSignature)
+	log.Infof("\nCalculated by us: %s\n", verificationString)
+	log.Infof("\nReceived from Slack: %s\n", requestSignature)
 	if verificationString == requestSignature {
 		return true
 	}

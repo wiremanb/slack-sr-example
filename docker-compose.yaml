@@ -1,0 +1,13 @@
+version: '3'
+services:
+  slack-sr:
+    build:
+      context: .
+    image: slack-sr:latest
+    stdin_open: true
+    tty: true
+    environment:
+      - SLACK_SIGNING_SECRET=$SLACK_SIGNING_SECRET
+    ports:
+      - 8080:8080
+    working_dir: /app
